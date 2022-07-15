@@ -42,9 +42,9 @@ def npi_check():
         npinumber = re.sub(r"[^0-9]", "",request.form['NPINUMBER'])
 
         # NPI numbers are required to be exactly 10 digits.
-        if len(npinumber) < 10:
-            logging.error('%s NPINUMBER was less than 10 digits' %npinumber)
-            return "ERROR, NO NPI NUMBER FOUND"
+        if len(npinumber) != 10:
+            logging.error('%s NPINUMBER was not 10 digits' %npinumber)
+            return "NPI number must be exactly 10 digits"
 
         # try NPPES api call.
         try:
@@ -68,7 +68,7 @@ def npi_check():
 
         # No results
         if response['result_count'] == 0 and isLocal == 0 or (len(rows) == 0 and isLocal == 1):
-            return "ERROR, NO NPI NUMBER FOUND"
+            return "No results found for %s" %npinumber
 
         # NPPES API working: Set PECOS API query to NPI# recieved from the NPPES API call.
         if isLocal == 0:   
@@ -497,6 +497,8 @@ def doc_check():
     count = 1
     x = 0
     npireturns_all = ""
+    DOCTOR_FIRSTNAME = ""
+    DOCTOR_LASTNAME = ""
 
     # Time stamps for logging/output.
     st = time.time()
@@ -582,8 +584,9 @@ def doc_check():
                     rows = cur.fetchall()
                     con.close()
 
-        if not "results" in response and isLocal == 0 or (len(rows) == 0 and isLocal == 1):
-            return "ERROR, NO DOCTOR BY THAT NAME FOUND"
+        if response['result_count'] == 0 and isLocal == 0 or (len(rows) == 0 and isLocal == 1):
+            return "No doctor found by the name '%s %s'" %(DOCTOR_FIRSTNAME,DOCTOR_LASTNAME)
+
         # NPPES API Down
         else:
             # NPPES API UP
