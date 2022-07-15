@@ -64,6 +64,8 @@ def row_count(file):
             pass
     return i
 print("Preparing CSV -> SQLite...")
+
+# Grab row count for print feedback.
 rows = row_count('./pecos.csv')
 chunks = 20000
 totalchunks = math.ceil(rows/chunks)
@@ -96,7 +98,8 @@ conn.close()
 et = time.time() - ist
 print("Index creation complete after",round(et,2),"seconds.")
 
-print("Removing CSV files...")
+# Remove unused CSV files
+print("\nRemoving CSV files...")
 files = glob.glob('./*.csv')
 for file in files:
     if os.path.exists(file):
