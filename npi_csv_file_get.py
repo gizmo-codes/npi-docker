@@ -67,7 +67,7 @@ print("File management complete.")
 # Rebuild database.
 print("\n----------- Updating database -----------")
 st = time.time()
-conn = sqlite3.connect('npi.db')
+conn = sqlite3.connect('./db/npi.db')
 et = time.time() - st
 print("Connetion to DB complete after", round(et,2), "seconds.")
 print("Dropping table...")

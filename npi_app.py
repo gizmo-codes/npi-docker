@@ -14,6 +14,9 @@ import sqlite3
 logging.basicConfig(filename='npi.log', level=logging.DEBUG)
 logging.debug('Program initialized')
 
+# Set database path.
+db = './db/npi.db'
+
 npi_app = Flask(__name__)
 CORS(npi_app)
 
@@ -53,7 +56,7 @@ def npi_check():
             response = {}
             response['result_count'] = 0
             isLocal = 1
-            con = sqlite3.connect('npi.db')
+            con = sqlite3.connect(db)
             cur = con.cursor()
             current_time = get_time()
             logging.debug('NPPES NPI SQL Query start %s %s' %(today,current_time))
@@ -105,7 +108,7 @@ def npi_check():
                 print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                 # Grab PECOS data from local SQL DB.
-                con = sqlite3.connect('npi.db')
+                con = sqlite3.connect(db)
                 cur = con.cursor()
                 logging.debug('NPI SQL Query start %s %s' %(today,current_time))
                 cur.execute("select * from pecos where [NPI]=%s" %(npinumber))
@@ -145,7 +148,7 @@ def npi_check():
                 print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                 # Grab NPPES and PECOS from local SQL DB.
-                con = sqlite3.connect('npi.db')
+                con = sqlite3.connect(db)
                 cur = con.cursor()
                 current_time = get_time()
                 logging.debug('NPPES & PECOS NPI SQL Query start %s %s' %(today,current_time))
@@ -220,7 +223,7 @@ def phone_check():
     if "PHONENUMBER" in request.form and len(request.form['PHONENUMBER']) > 9 and len(request.form['PHONENUMBER']) < 13:
         phonenumber = re.sub("[^0-9^.]", "", request.form['PHONENUMBER'])
         npireturns_all = ""
-        con = sqlite3.connect('npi.db')
+        con = sqlite3.connect(db)
         cur = con.cursor()
         current_time = get_time()
         logging.debug('Phone# SQL Query start %s %s' %(today,current_time))
@@ -236,8 +239,9 @@ def phone_check():
         # For each entry that had a matching phone number.
         for row in rows:
             npinumber = row[0]
-            print(npinumber)
-            print("Adding Healthcare Worker",count)
+            #print(npinumber)
+            #print("Adding Healthcare Worker",count)
+            print("Adding Healthcare Worker [ID: "+str(npinumber)+"]",count)
             count=count+1
             # try NPPES api call if it has NOT failed before.
             if nAPIdown == 0:
@@ -305,7 +309,7 @@ def phone_check():
                         print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                         # Grab PECOS data from local SQL DB.
-                        con = sqlite3.connect('npi.db')
+                        con = sqlite3.connect(db)
                         cur = con.cursor()
                         logging.debug('SQL Query start %s %s' %(today,current_time))
                         cur.execute("select * from pecos where [NPI]=%s" %(npinumber))
@@ -341,7 +345,7 @@ def phone_check():
                         print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                         # Grab NPPES and PECOS from local SQL DB.
-                        con = sqlite3.connect('npi.db')
+                        con = sqlite3.connect(db)
                         cur = con.cursor()
                         logging.debug('SQL Query start')
                         # NPPES data.
@@ -382,13 +386,12 @@ def phone_check():
 
             # pAPIdown = 1, prevent PECOS API call as it has already failed
             else:
-                print(".")
                 # Only PECOS API down, use local (SQL) data.
                 if isLocal == 0:
                     print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                     # Grab PECOS data from local SQL DB.
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     now = datetime.now()
                     current_time = now.strftime("%H:%M:%S")
@@ -428,7 +431,7 @@ def phone_check():
                     print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                     # Grab NPPES and PECOS from local SQL DB.
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     now = datetime.now()
                     current_time = now.strftime("%H:%M:%S")
@@ -519,7 +522,7 @@ def doc_check():
                     response['result_count'] = 0
                     isLocal = 1
                     nAPIdown = 1
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     logging.debug('SQL Query start')
                     cur.execute("select * from npi where [Provider Last Name (Legal Name)]='%s' AND ([Provider Business Mailing Address State Name]='%s' OR [Provider Business Practice Location Address State Name]='%s')" %(DOCTOR_LASTNAME, DOC_STATE, DOC_STATE))
@@ -535,7 +538,7 @@ def doc_check():
                     response['result_count'] = 0
                     isLocal = 1 
                     nAPIdown = 1
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     logging.debug('SQL Query start')
                     cur.execute("select * from npi where [Provider Last Name (Legal Name)]='%s'" %(DOCTOR_LASTNAME))
@@ -556,7 +559,7 @@ def doc_check():
                     response['result_count'] = 0
                     isLocal = 1 
                     nAPIdown = 1
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     logging.debug('SQL Query start')
                     cur.execute("select * from npi where [Provider Last Name (Legal Name)]='%s' AND [Provider First Name]='%s' AND ([Provider Business Mailing Address State Name]='%s' OR [Provider Business Practice Location Address State Name]='%s')" %(DOCTOR_LASTNAME,DOCTOR_FIRSTNAME, DOC_STATE, DOC_STATE))
@@ -572,7 +575,7 @@ def doc_check():
                     response['result_count'] = 0
                     isLocal = 1
                     nAPIdown = 1
-                    con = sqlite3.connect('npi.db')
+                    con = sqlite3.connect(db)
                     cur = con.cursor()
                     logging.debug('SQL Query start')
                     cur.execute("select * from npi where [Provider Last Name (Legal Name)] = '%s' AND [Provider First Name] = '%s'" %(DOCTOR_LASTNAME,DOCTOR_FIRSTNAME))
@@ -588,7 +591,8 @@ def doc_check():
                 # For each entry that had a matching phone number.
                 for results in response['results']:
                     npinumber = results['number']
-                    print("Adding Healthcare Worker",count)
+                    #print("Adding Healthcare Worker",count)
+                    print("Adding Healthcare Worker [ID: "+str(npinumber)+"]",count)
                     count=count+1
                     # try NPPES api call if it has NOT failed before.
                     if nAPIdown == 0:
@@ -653,7 +657,7 @@ def doc_check():
                                 print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                                 # Grab PECOS data from local SQL DB.
-                                con = sqlite3.connect('npi.db')
+                                con = sqlite3.connect(db)
                                 cur = con.cursor()
                                 logging.debug('SQL Query start %s %s' %(today,current_time))
                                 cur.execute("select * from pecos where [NPI]=%s" %(npinumber))
@@ -688,7 +692,7 @@ def doc_check():
                                 print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                                 # Grab NPPES and PECOS from local SQL DB.
-                                con = sqlite3.connect('npi.db')
+                                con = sqlite3.connect(db)
                                 cur = con.cursor()
                                 logging.debug('SQL Query start')
                                 # NPPES data.
@@ -728,13 +732,12 @@ def doc_check():
 
                     # pAPIdown = 1, prevent PECOS API call as it has already failed
                     else:
-                        print(".")
                         # Only PECOS API down, use local (SQL) data.
                         if isLocal == 0:
                             print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                             # Grab PECOS data from local SQL DB.
-                            con = sqlite3.connect('npi.db')
+                            con = sqlite3.connect(db)
                             cur = con.cursor()
                             now = datetime.now()
                             current_time = now.strftime("%H:%M:%S")
@@ -774,7 +777,7 @@ def doc_check():
                             print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                             # Grab NPPES and PECOS from local SQL DB.
-                            con = sqlite3.connect('npi.db')
+                            con = sqlite3.connect(db)
                             cur = con.cursor()
                             now = datetime.now()
                             current_time = now.strftime("%H:%M:%S")
@@ -830,7 +833,8 @@ def doc_check():
                 # For each entry that had a matching name.
                 for row in rows:
                     npinumber = row[0]
-                    print("Adding Healthcare Worker",count)
+                    #print("Adding Healthcare Worker",count)
+                    print("Adding Healthcare Worker [ID: "+str(npinumber)+"]",count)
                     count=count+1
                     # try NPPES api call if it has NOT failed before.
                     if nAPIdown == 0:
@@ -895,7 +899,7 @@ def doc_check():
                                 print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                                 # Grab PECOS data from local SQL DB.
-                                con = sqlite3.connect('npi.db')
+                                con = sqlite3.connect(db)
                                 cur = con.cursor()
                                 logging.debug('SQL Query start %s %s' %(today,current_time))
                                 cur.execute("select * from pecos where [NPI]=%s" %(npinumber))
@@ -929,7 +933,7 @@ def doc_check():
                                 print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                                 # Grab NPPES and PECOS from local SQL DB.
-                                con = sqlite3.connect('npi.db')
+                                con = sqlite3.connect(db)
                                 cur = con.cursor()
                                 logging.debug('SQL Query start')
                                 # NPPES data.
@@ -969,13 +973,12 @@ def doc_check():
 
                     # pAPIdown = 1, prevent PECOS API call as it has already failed
                     else:
-                        print(".")
                         # Only PECOS API down, use local (SQL) data.
                         if isLocal == 0:
                             print("-- PECOS API DOWN --\n-- Using local PECOS data... --\n")
 
                             # Grab PECOS data from local SQL DB.
-                            con = sqlite3.connect('npi.db')
+                            con = sqlite3.connect(db)
                             cur = con.cursor()
                             now = datetime.now()
                             current_time = now.strftime("%H:%M:%S")
@@ -1015,7 +1018,7 @@ def doc_check():
                             print("-- NPPES AND PECOS API DOWN --\n-- Using local NPPPES & PECOS data... --\n")
 
                             # Grab NPPES and PECOS from local SQL DB.
-                            con = sqlite3.connect('npi.db')
+                            con = sqlite3.connect(db)
                             cur = con.cursor()
                             now = datetime.now()
                             current_time = now.strftime("%H:%M:%S")

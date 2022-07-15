@@ -4,4 +4,4 @@ EXPOSE 5755
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
-CMD ["python", "npi_app.py"]
+CMD ["python","-u", "npi_app.py"]
