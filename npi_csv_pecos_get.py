@@ -65,11 +65,12 @@ def row_count(file):
     return i
 print("Preparing CSV -> SQLite...")
 rows = row_count('./pecos.csv')
-totalchunks = math.ceil(rows/20000)
+chunks = 20000
+totalchunks = math.ceil(rows/chunks)
 
 print("\n----------- CSV -> SQLite -----------")
 # Add CSV to SQLite database
-for npi_data in pd.read_csv('pecos.csv',chunksize=20000, low_memory=False,keep_default_na=False):
+for npi_data in pd.read_csv('pecos.csv',chunksize=chunks, low_memory=False,keep_default_na=False):
     ct = time.time()
     npi_data.to_sql("pecos", conn, if_exists='append', index=False)
     et = time.time() - ct
@@ -94,6 +95,13 @@ print("Idx2 creation complete after",round(et,2),"seconds.")
 conn.close()
 et = time.time() - ist
 print("Index creation complete after",round(et,2),"seconds.")
+
+print("Removing CSV files...")
+files = glob.glob('./*.csv')
+for file in files:
+    if os.path.exists(file):
+        os.remove(file)
+print("Removal finished.")
 
 # Script complete
 et = time.time() - st
