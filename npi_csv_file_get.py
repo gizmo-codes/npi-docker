@@ -9,7 +9,6 @@ import urllib.request, urllib.error
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 import time
-import csv
 import math
 
 # https://download.cms.gov/nppes/NPI_Files.html

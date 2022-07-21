@@ -39,7 +39,12 @@ def npi_check():
 
     # If the user entered >4 numbers into the NPI field, continue.
     if "NPINUMBER" in request.form and len(request.form['NPINUMBER']) > 4:
-        npinumber = re.sub(r"[^0-9]", "",request.form['NPINUMBER'])
+        # User input NPI number.
+        npinumber = request.form['NPINUMBER']
+
+        # Stripping everything that is not a letter.
+        npinumber = re.sub(r"[^0-9]", "",npinumber)
+        npinumber = re.sub(r'\s+', '', npinumber)
 
         # NPI numbers are required to be exactly 10 digits.
         if len(npinumber) != 10:
@@ -196,9 +201,10 @@ def npi_check():
 
                         return resp
     else:
-        return "INVALID NPI NUMBER"
+        return "NPI number must be exactly 10 digits"
 
 # API to check matching phone number.
+# TODO Delete spaces from user input.
 @npi_app.route('/phone_check', methods=['POST'])
 def phone_check():
     # Declare local variables.
@@ -220,8 +226,18 @@ def phone_check():
     headers = set_headers()
 
     # If phone number is between 10 and 12 digits continue.
-    if "PHONENUMBER" in request.form and len(request.form['PHONENUMBER']) > 9 and len(request.form['PHONENUMBER']) < 13:
-        phonenumber = re.sub("[^0-9^.]", "", request.form['PHONENUMBER'])
+    if "PHONENUMBER" in request.form:
+        # User input -> Phone number stripped of anything but digits.
+        phonenumber = request.form['PHONENUMBER']
+        phonenumber = re.sub(r"[^0-9]", '', phonenumber)
+
+        # Adding dashes for error feedback/readability.
+        p = phonenumber
+        p = '-'.join([p[:3], p[3:6], p[6:]])
+
+        if len(phonenumber) != 10:
+            return "%s is not a valid phone number." %p
+             
         npireturns_all = ""
         con = sqlite3.connect(db)
         cur = con.cursor()
@@ -234,7 +250,7 @@ def phone_check():
         con.close()
         logging.debug('Phone# SQL Query end %s %s' %(today,current_time))
         if len(rows) == 0:
-            return "NO RESULTS FOUND FOR THAT NUMBER"
+            return "NO RESULTS FOUND FOR %s" %p
 
         # For each entry that had a matching phone number.
         for row in rows:
@@ -357,7 +373,7 @@ def phone_check():
 
                         # Local NPPES SQL DB returned no rows, therefore no matching doctor by given NPI number.
                         if len(npirows) == 0:
-                            return "NO RESULTS FOUND FOR THAT NUMBER"
+                            return "NO RESULTS FOUND FOR %s" %p
                         # Local NPPES SQL DB returned rows, check for PECOS data mathcing given NPI.
                         else:
                             # No matching local PECOS data found for given NPI, set PECOS data as empty.
@@ -447,7 +463,7 @@ def phone_check():
 
                     # Local NPPES SQL DB returned no rows, therefore no matching doctor by given NPI number.
                     if len(npirows) == 0:
-                        return "NO RESULTS FOUND FOR THAT NUMBER"
+                        return "NO RESULTS FOUND FOR %s" %p
                     # Local NPPES SQL DB returned rows, check for PECOS data mathcing given NPI.
                     else:
                         # No matching local PECOS data found for given NPI, set PECOS data as empty.
@@ -482,8 +498,6 @@ def phone_check():
         elapsed_time = et - st
         resp = jsonify('<table id="respTable"><thead><tr id=sticky><th>NPI</th><th class=fitwidth>Name</th><th>Credential</th><th class=fitwidth>Practice #</th><th class=fitwidth>Mailing #</th><th class=fitwidth>Fax</th><th>Primary Practice</th><th>Mailing Address</th><th class=fitwidth>Other Practice</th><th>PECOS</th><th class=maxwidth>Email</th></tr></thead>' + npireturns_all + '</table><br><font color=red>Execution Time: ' + str(round(elapsed_time,2)) + ' seconds</font>')
         return resp
-    else:
-        return "INVALID PHONE NUMBER"
 
 # API to check for matching doctor name.
 @npi_app.route('/doc_check', methods=['POST'])
