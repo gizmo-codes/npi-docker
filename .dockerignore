@@ -4,4 +4,5 @@ npi_csv_file_get.py
 npi_csv_pecos_get.py
 npi.db
 rootkey.csv
+.gitignore
 /db

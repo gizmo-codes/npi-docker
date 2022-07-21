@@ -8,7 +8,7 @@ services:
       - 5755:5755
     volumes:
     # - db1:/app/db
-      - "C:/Users/Omzig/Desktop/Personal_Projects/npi-docker:/app"
+      - ".:/app"
       - type: bind
         source: C:\sqlite\db
         target: /app/db
