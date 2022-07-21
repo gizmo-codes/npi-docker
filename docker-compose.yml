@@ -1,6 +1,6 @@
 services:
   npiapp:
-    image: python
+    #image: python
     build: .
     environment:
       - PYTHONUNBUFFERED=1
