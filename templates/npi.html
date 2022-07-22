@@ -312,7 +312,7 @@
       } else {
         $.ajax({
           type: "POST",
-          url: "http://localhost:5755/npi_check",
+          url: "https://npiapp.azurewebsites.net/npi_check",
           data: $('#NPIChecker').serialize(),
           dataType: "html",
           cache: false,
@@ -327,8 +327,9 @@
             changeBackground();
           },
           error: function (jqXHR, textStatus, errorThrown) {
+            removeLoading();
             $('#msg').show();
-            $("#msg").html(textStatus + " " + errorThrown);
+            $("#msg").html(JSON.stringify(jqXHR) + " " + JSON.stringify(textStatus) + " " + errorThrown);
           }
         });
       }
@@ -343,7 +344,7 @@
       } else {
         $.ajax({
           type: "POST",
-          url: "http://localhost:5755/phone_check",
+          url: "https://npiapp.azurewebsites.net/phone_check",
           data: $('#NPIChecker').serialize(),
           dataType: "html",
           cache: false,
@@ -358,8 +359,9 @@
             changeBackground();
           },
           error: function (jqXHR, textStatus, errorThrown) {
+            removeLoading();
             $('#msg').show();
-            $("#msg").html(textStatus + " " + errorThrown);
+            $("#msg").html(JSON.stringify(jqXHR) + " " + JSON.stringify(textStatus) + " " + errorThrown);
           }
         });
       }
@@ -374,7 +376,7 @@
       } else {
         $.ajax({
           type: "POST",
-          url: "http://localhost:5755/doc_check",
+          url: "https://npiapp.azurewebsites.net/doc_check",
           data: $('#NPIChecker').serialize(),
           dataType: "html",
           cache: false,
@@ -389,8 +391,9 @@
             changeBackground();
           },
           error: function (jqXHR, textStatus, errorThrown) {
+            removeLoading();
             $('#msg').show();
-            $("#msg").html(textStatus + " " + errorThrown);
+            $("#msg").html(JSON.stringify(jqXHR) + " " + JSON.stringify(textStatus) + " " + errorThrown);
           }
         });
       }
@@ -399,7 +402,7 @@
 </head>
 
 <body>
-  <form id="NPIChecker" class="NPIChecker" method="POST" action="http://npi.lymphait.com/npi">
+  <form id="NPIChecker" class="NPIChecker" method="POST" action="https://npiapp.azurewebsites.net/npi">
     <fieldset>
       <legend> <b>NPI Checker</b> </legend>
       <div class="msg" id="msg"></div>

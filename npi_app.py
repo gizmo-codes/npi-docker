@@ -1244,4 +1244,5 @@ def npi():
         return render_template('npi.html')
 
 if __name__ == '__main__':
-    npi_app.run(host='0.0.0.0', port=5755, debug=True)
+    npi_app.run(host='0.0.0.0', port=80, threads=8, debug=True)
+    #npi_app.run(host='0.0.0.0', port=80, debug=True)

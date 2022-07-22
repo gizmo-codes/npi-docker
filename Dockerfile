@@ -1,6 +1,6 @@
 FROM python
-ENV LISTEN_PORT=5755
-EXPOSE 5755
+ENV LISTEN_PORT=80
+EXPOSE 80
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
@@ -8,4 +8,4 @@ COPY . .
 # Shell form (/bin/sh)
 # CMD python -u npi_app.py
 # Exec form
-CMD ["python","-u", "npi_app.py"]
+CMD ["waitress-serve","--listen=*:80", "npi_app:npi_app"]
