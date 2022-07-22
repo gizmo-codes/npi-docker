@@ -8,4 +8,4 @@ COPY . .
 # Shell form (/bin/sh)
 # CMD python -u npi_app.py
 # Exec form
-CMD ["python","-u", "npi_app.py"]
+CMD ["waitress-serve","--listen=*:80", "npi_app:npi_app"]

@@ -1,0 +1,15 @@
+services:
+  npiapp:
+    container_name: npiapp
+    image: omzig7/npi:port80
+    environment:
+      - PYTHONUNBUFFERED=1
+      - COMPOSE_PROJECT_NAME=npi
+    ports:
+      - 80:80
+    volumes:
+    # - db1:/app/db
+      - ".:/app"
+      - type: bind
+        source: C:\sqlite\db
+        target: /app/db
