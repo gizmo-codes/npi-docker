@@ -1,6 +1,6 @@
 FROM python
-ENV LISTEN_PORT=5755
-EXPOSE 5755
+ENV LISTEN_PORT=80
+EXPOSE 80
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
